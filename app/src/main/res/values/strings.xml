@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">Explore Ease</string>
+    <string-array name="country_locations">
+        <item>Bangladesh</item>
+        <item>USA</item>
+        <item>UK</item>
+        <item>India</item>
+    </string-array>
+    <string-array name="hotels_bangladesh">
+        <item>Pan Pacific</item>
+        <item>Radisson Blu</item>
+        <item>Westin</item>
+        <item>Le Meridien</item>
+    </string-array>
+    <string-array name="hotels_usa">
+        <item>Hilton</item>
+        <item>Marriott</item>
+        <item>Hyatt</item>
+        <item>Sheraton</item>
+    </string-array>
+    <string-array name="hotels_uk">
+        <item>The Ritz</item>
+        <item>The Savoy</item>
+        <item>Claridge</item>
+        <item>Brown</item>
+    </string-array>
+    <string-array name="hotels_india">
+        <item>Taj Mahal</item>
+        <item>Oberoi</item>
+        <item>Leela</item>
+        <item>ITC Maurya</item>
+    </string-array>
+</resources>
