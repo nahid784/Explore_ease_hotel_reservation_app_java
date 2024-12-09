@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "792192759628",
+    "project_id": "travel-6b33a",
+    "storage_bucket": "travel-6b33a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:792192759628:android:26a0e80d0ec7d2f0f5c1e9",
+        "android_client_info": {
+          "package_name": "com.example.hotelres"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbP_bF8agVX7PEn6Mwk8BeCFKkhrncn2s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
