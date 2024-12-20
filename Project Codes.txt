@@ -1,0 +1,1519 @@
+confirm.xml:
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blue"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:text="Fillup this form to confirm booking"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <EditText
+            android:id="@+id/cname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="Customer Name"
+            android:inputType="textPersonName"
+            android:minHeight="50dp"
+            android:textColorHint="@color/white" />
+
+        <EditText
+            android:id="@+id/cadd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:hint="Enter Address"
+            android:inputType="textPersonName"
+            android:minHeight="50dp"
+            android:textColorHint="@color/white" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/indate"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:hint="Check-In Date"
+                android:inputType="date"
+                android:minHeight="50dp"
+                android:textColorHint="@color/white" />
+
+            <EditText
+                android:id="@+id/outdate"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:hint="Check-Out Date"
+                android:inputType="date"
+                android:minHeight="50dp"
+                android:textColorHint="@color/white" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textView10"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:text="Select Room Type"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:id="@+id/roomTypeRadioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/single"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Single"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <RadioButton
+                android:id="@+id/two"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Double"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <RadioButton
+                android:id="@+id/deluxe"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Deluxe"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+        </RadioGroup>
+
+        <FrameLayout
+            android:id="@+id/roomDetailsFragmentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/confirm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:backgroundTint="@color/Orange"
+        android:text="Confirm Reservation"
+        android:textColor="@color/white"
+        android:textSize="18sp" />
+</LinearLayout>
+
+-----------------------------------------------------------------------
+
+confirm.java:
+
+package com.example.hotelres;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Toast;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+public class confirm extends AppCompatActivity {
+
+    private RadioGroup roomTypeRadioGroup;
+    private room_details roomDetailsFragment;
+    private FragmentManager fragmentManager;
+    private EditText customerName, customerAddress, checkInDate, checkOutDate;
+    private Button confirmReservationButton;
+
+    private DatabaseReference databaseReference;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.confirm);
+        this.setTitle("Confirm your Booking");
+
+        roomTypeRadioGroup = findViewById(R.id.roomTypeRadioGroup);
+        fragmentManager = getSupportFragmentManager();
+        customerName = findViewById(R.id.cname);
+        customerAddress = findViewById(R.id.cadd);
+        checkInDate = findViewById(R.id.indate);
+        checkOutDate = findViewById(R.id.outdate);
+        confirmReservationButton = findViewById(R.id.confirm);
+
+        roomDetailsFragment = new room_details();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.roomDetailsFragmentContainer, roomDetailsFragment);
+        fragmentTransaction.commit();
+
+        databaseReference = FirebaseDatabase.getInstance().getReference("Reservations");
+
+        roomTypeRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                String details = "";
+                switch (checkedId) {
+                    case R.id.single:
+                        details = "Economic Single rooms consist usually of one room and include a set of necessary furniture and appliances." +
+                                "The area ranges from 12-15 m2 to 20-23 m2 and contains a single bed, a width of 90 cm, a wardrobe, desk," +
+                                "television, often have air conditioning, telephone, writing utensils, refrigerator and kettle.";
+                        break;
+                    case R.id.two:
+                        details = "A double room is a hotel room with a double bed that can accommodate two people." +
+                                "Double rooms come in different sizes, and the room size can affect the room rate.";
+                        break;
+                    case R.id.deluxe:
+                        details = "Deluxe rooms, are modern decorated, can accommodate up to 2 persons," +
+                                "totally soundproofed and equipped with high tech comforts such as high speed internet.";
+                        break;
+                }
+                roomDetailsFragment.updateRoomDetails(details);
+            }
+        });
+
+        confirmReservationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirmReservation();
+            }
+        });
+    }
+
+    private void confirmReservation() {
+        String name = customerName.getText().toString().trim();
+        String address = customerAddress.getText().toString().trim();
+        String checkIn = checkInDate.getText().toString().trim();
+        String checkOut = checkOutDate.getText().toString().trim();
+        int selectedRoomId = roomTypeRadioGroup.getCheckedRadioButtonId();
+        RadioButton selectedRoomButton = findViewById(selectedRoomId);
+        String roomType = selectedRoomButton.getText().toString();
+
+        if (name.isEmpty() || address.isEmpty() || checkIn.isEmpty() || checkOut.isEmpty() || roomType.isEmpty()) {
+            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Get country and hotel from the previous activity (page2)
+        Intent intent = getIntent();
+        String country = intent.getStringExtra("country");
+        String hotel = intent.getStringExtra("hotel");
+
+        // Generate a unique ID for each reservation
+        String reservationId = databaseReference.push().getKey();
+
+        // Create a reservation object
+        Reservation reservation = new Reservation(reservationId, name, address, checkIn, checkOut, roomType, country, hotel);
+
+        // Save the reservation to Firebase
+        databaseReference.child(reservationId).setValue(reservation)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(confirm.this, "Hotel booking confirmed", Toast.LENGTH_SHORT).show();
+                    // Optionally, navigate to another activity or perform other actions
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(confirm.this, "Failed to confirm booking: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+
+        Intent page3Intent = new Intent(confirm.this, reservation_info.class);
+        page3Intent.putExtra("name", name);
+        page3Intent.putExtra("address", address);
+        page3Intent.putExtra("checkIn", checkIn);
+        page3Intent.putExtra("checkOut", checkOut);
+        page3Intent.putExtra("roomType", roomType);
+        page3Intent.putExtra("country", country);
+        page3Intent.putExtra("hotel", hotel);
+        startActivity(page3Intent);
+    }
+
+    // Define a Reservation class to structure the data
+    public static class Reservation {
+        public String id;
+        public String name;
+        public String address;
+        public String checkInDate;
+        public String checkOutDate;
+        public String roomType;
+        public String country;
+        public String hotel;
+
+        public Reservation() {
+
+        }
+
+        public Reservation(String id, String name, String address, String checkInDate, String checkOutDate, String roomType, String country, String hotel) {
+            this.id = id;
+            this.name = name;
+            this.address = address;
+            this.checkInDate = checkInDate;
+            this.checkOutDate = checkOutDate;
+            this.roomType = roomType;
+            this.country = country;
+            this.hotel = hotel;
+        }
+    }
+}
+
+-----------------------------------------------------------------------
+
+custom_spinner.xml:
+
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:textColor="@color/black"
+    android:textSize="18sp" />
+
+-------------------------------------------------------------------------
+
+get_started.xml:
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".get_started">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/intro" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Let's Enjoy The\n
+Beatutiful World"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Explore new places in the world\n
+and get new experiences"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="20sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="50dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/intro_background">
+
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="130dp"
+                    android:layout_marginTop="12dp"
+                    android:text="Get Started"
+                    android:textColor="@color/white"
+                    android:textSize="21sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/imageView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="80dp"
+                    android:layout_marginTop="3dp"
+                    app:srcCompat="@drawable/arrow" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
+
+----------------------------------------------------------------------
+
+get_started.java:
+
+package com.example.hotelres;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+public class get_started extends AppCompatActivity {
+
+    private TextView getStartedTextView;
+    private ImageView arrowImageView;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.get_started);
+
+        getStartedTextView = findViewById(R.id.textView3);
+        arrowImageView = findViewById(R.id.imageView2);
+
+        View.OnClickListener getStartedClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Intent to navigate to the second page
+                Intent intent = new Intent(get_started.this, select_hotel.class);
+                startActivity(intent);
+            }
+        };
+
+        getStartedTextView.setOnClickListener(getStartedClickListener);
+        arrowImageView.setOnClickListener(getStartedClickListener);
+    }
+}
+
+
+----------------------------------------------------------------------------
+
+login.xml:
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blue"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="20dp"
+        android:padding="10dp">
+
+        <EditText
+            android:id="@+id/loginemail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/search_background"
+            android:hint="Email"
+            android:inputType="textEmailAddress"
+            android:minHeight="50dp"
+            android:padding="10dp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/black"
+            android:textSize="20sp"
+            tools:ignore="TouchTargetSizeCheck" />
+
+        <EditText
+            android:id="@+id/loginpass"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/search_background"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:minHeight="50dp"
+            android:padding="10dp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/black"
+            android:textSize="20sp"
+            tools:ignore="TouchTargetSizeCheck" />
+
+        <Button
+            android:id="@+id/login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="@color/Orange"
+            android:text="Login"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/newuser"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Are you new user ?  Sign Up"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:textSize="20sp"/>
+
+    <Button
+        android:id="@+id/offline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="450dp"
+        android:backgroundTint="@color/Orange"
+        android:text="Offline Access" />
+
+</LinearLayout>
+
+------------------------------------------------------------------------------
+
+login.java:
+
+package com.example.hotelres;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+public class login extends AppCompatActivity {
+
+    private EditText loginEmail, loginPassword;
+    private Button loginButton;
+    private TextView newUser, offlineAccess;
+    private FirebaseAuth mAuth;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.login);
+        this.setTitle("Sign In Activity");
+
+        mAuth = FirebaseAuth.getInstance();
+
+        loginEmail = findViewById(R.id.loginemail);
+        loginPassword = findViewById(R.id.loginpass);
+        loginButton = findViewById(R.id.login);
+        newUser = findViewById(R.id.newuser);
+        offlineAccess = findViewById(R.id.offline);
+
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String email = loginEmail.getText().toString();
+                String password = loginPassword.getText().toString();
+
+                if (validateLogin(email, password)) {
+                    // Sign in with Firebase Authentication
+                    mAuth.signInWithEmailAndPassword(email, password)
+                            .addOnCompleteListener(login.this, new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if (task.isSuccessful()) {
+                                        // Sign in success, update UI with the signed-in user's information
+                                        FirebaseUser user = mAuth.getCurrentUser();
+                                        Toast.makeText(login.this, "Authentication success.",
+                                                Toast.LENGTH_SHORT).show();
+                                        // Proceed to next activity
+                                        Intent intent = new Intent(login.this, get_started.class);
+                                        startActivity(intent);
+                                        finish();
+                                    } else {
+                                        // If sign in fails, display a message to the user.
+                                        Toast.makeText(login.this, "Authentication failed.",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                } else {
+                    Toast.makeText(login.this, "Please enter a valid email and password", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        newUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Navigate to Sign Up activity
+                Intent intent = new Intent(login.this, sign_up.class);
+                startActivity(intent);
+            }
+        });
+
+        offlineAccess.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Navigate to MainActivity
+                Intent intent = new Intent(login.this, get_started.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+    private boolean validateLogin(String email, String password) {
+        // Add your own validation logic if needed
+        return !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password);
+    }
+}
+
+
+---------------------------------------------------------------------------------------------
+
+reservation_info.xml:
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blue"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="30dp"
+        android:padding="16dp"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textView9"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="150dp"
+        android:text="Reservation Confirmed !"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="25sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/home"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="30dp"
+        android:backgroundTint="@color/Orange"
+        android:text="Go To Home"
+        android:textSize="18dp"
+        android:textStyle="bold" />
+
+
+</LinearLayout>
+
+
+--------------------------------------------------------------------------
+
+reservation_info.java:
+
+
+package com.example.hotelres;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+public class reservation_info extends AppCompatActivity {
+
+    private Button gohome;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.reservation_info);
+
+        gohome = findViewById(R.id.home);
+
+        setuphome();
+
+        // Retrieve data passed from the previous activity
+        Intent intent = getIntent();
+        String name = intent.getStringExtra("name");
+        String address = intent.getStringExtra("address");
+        String checkIn = intent.getStringExtra("checkIn");
+        String checkOut = intent.getStringExtra("checkOut");
+        String roomType = intent.getStringExtra("roomType");
+        String country = intent.getStringExtra("country");
+        String hotel = intent.getStringExtra("hotel");
+
+        // Display the data on the UI
+        TextView textView = findViewById(R.id.textView);
+        textView.setText("User Name: " + name + "\n" +
+                "Selected Country: " + country + "\n" +
+                "Selected Hotel: " + hotel +
+                "Address: " + address + "\n" +
+                "Room Type: " + roomType + "\n" +
+                "Check-In Date: " + checkIn + "\n" +
+                "Check-Out Date: " + checkOut + "\n");
+    }
+
+    private void setuphome() {
+        gohome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent newhome = new Intent(reservation_info.this, get_started.class);
+                startActivity(newhome);
+            }
+        });
+    }
+}
+
+
+----------------------------------------------------------------------
+
+room_details.xml:
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/Orange">
+
+    <TextView
+        android:id="@+id/roomDetailsTextView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textColor="@color/white"
+        android:textSize="15sp" />
+</LinearLayout>
+
+
+-----------------------------------------------------------------
+
+room_details.java:
+
+package com.example.hotelres;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+public class room_details extends Fragment {
+
+    private TextView roomDetailsTextView;
+
+    public room_details() {
+        // Required empty public constructor
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.room_details, container, false);
+        roomDetailsTextView = view.findViewById(R.id.roomDetailsTextView);
+        return view;
+    }
+
+    public void updateRoomDetails(String details) {
+        roomDetailsTextView.setText(details);
+    }
+}
+
+
+--------------------------------------------------------------------------
+
+select_hotel.xml:
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blue"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:paddingTop="20dp">
+
+    <LinearLayout
+        android:layout_width="379dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/imageView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/profile" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Welcome Back"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Jack Reacher"
+                android:textColor="@color/white"
+                android:textSize="27sp" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/imageView6"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginLeft="100dp"
+            app:srcCompat="@drawable/bell" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:text="Discover the Best Place\nTo Travel"
+        android:textColor="@color/white"
+        android:textSize="28sp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="50dp"
+        android:orientation="horizontal">
+
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteTextView"
+            android:layout_width="375dp"
+            android:layout_height="50dp"
+            android:background="@drawable/search_background"
+            android:drawableLeft="@drawable/search_icon"
+            android:drawablePadding="15dp"
+            android:ems="10"
+            android:hint="Search Location..."
+            android:minHeight="50dp"
+            android:padding="10dp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/black"
+            android:textSize="20sp"
+            tools:ignore="TouchTargetSizeCheck" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/weatherTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:text=" "
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <TextView
+        android:id="@+id/textView13"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:text="Available Hotels"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="28sp"
+        android:textStyle="bold" />
+
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:background="@drawable/spinner_border"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <Button
+        android:id="@+id/selecthotel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Select Hotel"
+        android:backgroundTint="@color/Orange"
+        android:textColor="@color/white"
+        android:textSize="18sp"/>
+
+
+</LinearLayout>
+
+-----------------------------------------------------------
+
+select_hotel.java:
+
+package com.example.hotelres;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
+public class select_hotel extends AppCompatActivity {
+
+    private AutoCompleteTextView autoCompleteTextView;
+    private Spinner spinner;
+    private Button nexthotel;
+    private TextView weatherTextView;
+
+
+    private Map<String, String[]> hotelData;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.select_hotel);
+
+        autoCompleteTextView = findViewById(R.id.autoCompleteTextView);
+        spinner = findViewById(R.id.spinner);
+        nexthotel = findViewById(R.id.selecthotel);
+        weatherTextView = findViewById(R.id.weatherTextView);
+
+        initializeHotelData();
+        setupAutoCompleteTextView();
+        setupnexthotel();
+    }
+
+    private void initializeHotelData() {
+        hotelData = new HashMap<>();
+        hotelData.put("Bangladesh", getResources().getStringArray(R.array.hotels_bangladesh));
+        hotelData.put("USA", getResources().getStringArray(R.array.hotels_usa));
+        hotelData.put("UK", getResources().getStringArray(R.array.hotels_uk));
+        hotelData.put("India", getResources().getStringArray(R.array.hotels_india));
+    }
+
+    private void setupAutoCompleteTextView() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, getResources().getStringArray(R.array.country_locations));
+        autoCompleteTextView.setAdapter(adapter);
+
+        autoCompleteTextView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // Filter hotels
+                filterHotels(charSequence.toString());
+
+                // Fetch weather information
+                fetchWeather(charSequence.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+    }
+
+    private void filterHotels(String query) {
+        if (query.isEmpty() || !hotelData.containsKey(query)) {
+            spinner.setVisibility(View.GONE);
+            return;
+        }
+
+        spinner.setVisibility(View.VISIBLE);
+
+        String[] hotels = hotelData.get(query);
+        List<String> filteredHotels = new ArrayList<>();
+        for (String hotel : hotels) {
+            filteredHotels.add(hotel);
+        }
+
+        ArrayAdapter<String> filteredAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, filteredHotels);
+        filteredAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(filteredAdapter);
+    }
+
+    private void setupnexthotel() {
+        nexthotel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String selectedHotel = (String) spinner.getSelectedItem();
+                String selectedCountry = autoCompleteTextView.getText().toString();
+
+                if (selectedHotel == null || selectedCountry.isEmpty()) {
+                    Toast.makeText(select_hotel.this, "Please select a country and a hotel", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                Intent confirmIntent = new Intent(select_hotel.this, confirm.class);
+                confirmIntent.putExtra("country", selectedCountry);
+                confirmIntent.putExtra("hotel", selectedHotel);
+                startActivity(confirmIntent);
+            }
+        });
+    }
+
+    private void fetchWeather(String country) {
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url("https://api.openweathermap.org/data/2.5/weather?q=" + country + "&appid=3d8645065d85b8f63b50d1e204c95e03&units=metric")
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    final String responseData = response.body().string();
+                    select_hotel.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                JSONObject json = new JSONObject(responseData);
+                                JSONArray weatherArray = json.getJSONArray("weather");
+                                JSONObject weatherObject = weatherArray.getJSONObject(0);
+                                String description = weatherObject.getString("description");
+
+                                JSONObject mainObject = json.getJSONObject("main");
+                                double temperature = mainObject.getDouble("temp");
+
+                                String weatherInfo = String.format("Temperature: %.1f°C, Description: %s", temperature, description);
+                                weatherTextView.setText(weatherInfo);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+}
+
+
+---------------------------------------------------------------------------------------------
+
+sign_up.xml:
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blue"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Sign Up page for new user"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="25sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="20dp"
+        android:padding="10dp">
+
+        <EditText
+            android:id="@+id/createemail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/search_background"
+            android:hint="Email"
+            android:inputType="textEmailAddress"
+            android:minHeight="50dp"
+            android:padding="10dp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/black"
+            android:textSize="20sp"
+            tools:ignore="TouchTargetSizeCheck" />
+
+        <EditText
+            android:id="@+id/createpass"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/search_background"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:minHeight="50dp"
+            android:padding="10dp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/black"
+            android:textSize="20sp"
+            tools:ignore="TouchTargetSizeCheck" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Gender"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:id="@+id/genderGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/male"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Male"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <RadioButton
+                android:id="@+id/female"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:text="Female"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/signup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="@color/Orange"
+            android:text="Sign Up"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+</LinearLayout>
+
+
+-----------------------------------------------------------
+
+sign_up.java:
+
+package com.example.hotelres;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+public class sign_up extends AppCompatActivity {
+
+    private EditText createEmail, createPassword;
+    private RadioGroup genderGroup;
+    private RadioButton selectedGender;
+    private Button signUpButton;
+
+    private FirebaseAuth mAuth;
+    private DatabaseReference mDatabase;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.sign_up);
+        this.setTitle("Create New Account");
+
+        mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
+
+        createEmail = findViewById(R.id.createemail);
+        createPassword = findViewById(R.id.createpass);
+        genderGroup = findViewById(R.id.genderGroup);
+        signUpButton = findViewById(R.id.signup);
+
+        signUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String email = createEmail.getText().toString();
+                final String password = createPassword.getText().toString();
+                int selectedGenderId = genderGroup.getCheckedRadioButtonId();
+                selectedGender = findViewById(selectedGenderId);
+
+                if (validateSignUp(email, password)) {
+                    // Create user with Firebase Authentication
+                    mAuth.createUserWithEmailAndPassword(email, password)
+                            .addOnCompleteListener(sign_up.this, new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if (task.isSuccessful()) {
+                                        // Save additional user data to Firebase Realtime Database
+                                        String userId = mAuth.getCurrentUser().getUid();
+                                        DatabaseReference currentUserDb = mDatabase.child(userId);
+                                        currentUserDb.child("email").setValue(email);
+                                        currentUserDb.child("gender").setValue(selectedGender.getText().toString());
+
+                                        // Navigate to Login Activity after successful sign-up
+                                        Intent intent = new Intent(sign_up.this, login.class);
+                                        startActivity(intent);
+                                        finish();
+                                    } else {
+                                        // If sign in fails, display a message to the user.
+                                        Toast.makeText(sign_up.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                } else {
+                    Toast.makeText(sign_up.this, "Please enter a valid email and password", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private boolean validateSignUp(String email, String password) {
+        // Add your validation logic here
+        return !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password) &&
+                email.contains("@") && password.length() >= 6 && genderGroup.getCheckedRadioButtonId() != -1;
+    }
+}
+
+
+-------------------------------------------------------------------------------
+
+AndroidManifest.xml:
+
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.HotelRes"
+        tools:targetApi="31">
+
+        <activity
+            android:name=".confirm"
+            android:exported="false"
+            android:parentActivityName=".select_hotel"/>
+        <activity
+            android:name=".reservation_info"
+            android:exported="true"
+            android:parentActivityName=".select_hotel" />
+        <activity
+            android:name=".sign_up"
+            android:exported="true"
+            android:parentActivityName=".login" />
+        <activity
+            android:name=".login"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".get_started"
+            android:exported="true"
+            android:parentActivityName=".login" />
+        <activity
+            android:name=".select_hotel"
+            android:exported="true"
+            android:parentActivityName=".get_started" />
+    </application>
+
+</manifest>
+
+----------------------------------------------------------------------------
+
+colors.xml:
+
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="Orange">#FE6900</color>
+    <color name="blue">#3AA3A5</color>
+</resources>
+
+-------------------------------------------------------------
+
+string.xml:
+
+<resources>
+    <string name="app_name">Explore Ease</string>
+    <string-array name="country_locations">
+        <item>Bangladesh</item>
+        <item>USA</item>
+        <item>UK</item>
+        <item>India</item>
+    </string-array>
+    <string-array name="hotels_bangladesh">
+        <item>Pan Pacific</item>
+        <item>Radisson Blu</item>
+        <item>Westin</item>
+        <item>Le Meridien</item>
+    </string-array>
+    <string-array name="hotels_usa">
+        <item>Hilton</item>
+        <item>Marriott</item>
+        <item>Hyatt</item>
+        <item>Sheraton</item>
+    </string-array>
+    <string-array name="hotels_uk">
+        <item>The Ritz</item>
+        <item>The Savoy</item>
+        <item>Claridge</item>
+        <item>Brown</item>
+    </string-array>
+    <string-array name="hotels_india">
+        <item>Taj Mahal</item>
+        <item>Oberoi</item>
+        <item>Leela</item>
+        <item>ITC Maurya</item>
+    </string-array>
+</resources>
+
+
+-------------------------------------------------------
+
+styles.xml:
+
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="CustomSpinnerTextStyle">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+</resources>
+
+
+------------------------------------------------
+
+build.gradle(project):
+
+buildscript {
+    dependencies {
+        classpath 'com.google.gms:google-services:4.3.10'
+    }
+}// Top-level build file where you can add configuration options common to all sub-projects/modules.
+plugins {
+    id 'com.android.application' version '7.4.2' apply false
+    id 'com.android.library' version '7.4.2' apply false
+    id("com.google.gms.google-services") version "4.4.1" apply false
+}
+
+------------------------------------------------------
+
+build.gradle(app):
+
+plugins {
+    id 'com.android.application'
+    id("com.google.gms.google-services")
+}
+
+android {
+    namespace 'com.example.hotelres'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.example.hotelres"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'com.google.android.gms:play-services-maps:18.0.2'
+    implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation 'com.google.firebase:firebase-database:20.0.4'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+    implementation 'com.google.firebase:firebase-auth:21.0.1'
+
+
+}
+
+--------------------------------------------------------------------
+
+
+
